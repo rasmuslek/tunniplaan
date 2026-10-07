@@ -8,7 +8,7 @@ Sinu tunnid ja sündmused üheks nädalaks, kenasti ühes kohas.
 {{ $startDate->copy()->locale('et')->translatedFormat('j. F') }}–{{ $endDate->copy()->locale('et')->translatedFormat('j. F Y') }}
 
 **Kokku**  
-{{ $timetableEvents->flatten(1)->count() }} {{ $timetableEvents->flatten(1)->count() === 1 ? 'sündmus' : 'sündmust' }}
+{{ $timetableEvents->flatten(1)->count() }} {{ $timetableEvents->flatten(1)->count() === 1 ? 'tund' : 'tundi' }}
 </x-mail::panel>
 
 @if ($timetableEvents->isEmpty())
