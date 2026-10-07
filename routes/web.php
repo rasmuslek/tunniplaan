@@ -1,26 +1,33 @@
 <?php
 
-use App\Models\Author;
+use App\Mail\Timetable;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/tere', function () {
+Route::get('/mailable', function () {
 
-    $authors = Author::all();
+    $startDate = Carbon::now()->startOfWeek();
+    $endDate = Carbon::now()->endOfWeek();
 
-    $authors->load('books.reviews', 'reviews');
+    $data = Http::get('https://tahveltp.edu.ee/hois_back/timetableevents/timetableSearch', [
+        'from' => $startDate,
+        'lang' => 'ET',
+        'page' => 0,
+        'schoolId' => 38,
+        'size' => 50,
+        'studentGroups' => 'ea0550fb-8387-4aa2-880a-9abbd37a69ce',
+        'thru' => $endDate,
+    ])->json();
 
-    // $books = [];
+    $timetableEvents = collect($data['content'])
+        ->sortBy(['date', 'timeStart'])
+        ->groupBy(function ($event) {
+            return Carbon::parse($event['date'])->locale('et_EE')->dayName;
+        });
 
-    // foreach ($authors as $author) {
-    //     $books = array_merge($books, $author->books->toArray());
-    // }
-    
-    return view('tere', [
-        'authors' => $authors,
-    ]);
-
+    return new Timetable($timetableEvents, $startDate, $endDate);
 });
